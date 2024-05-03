@@ -112,6 +112,60 @@ Don't forget to explore our sibling project, [Open WebUI Community](https://open
 > [!NOTE]  
 > Please note that for certain Docker environments, additional configurations might be needed. If you encounter any connection issues, our detailed guide on [Open WebUI Documentation](https://docs.openwebui.com/) is ready to assist you.
 
+
+### Running on Kubernetes as a helm chart
+
+This helm chart would deploy olla-webui as a LoadBalancer. 
+To install Open WebUI on Kubernetes using Helm, run:
+``` bash
+helm install ollama-webui ./open-webui-1.0.0.tgz --create-namespace --namespace ollama-webui
+```
+
+If the helm chart installation is succcessful, it will print out details of the deployment including the name, namespace, status, revision etc.
+```
+NAME: ollama-webui
+LAST DEPLOYED: Thu May  2 14:08:21 2024
+NAMESPACE: ollama-webui
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
+```
+
+To verify the pods and services, 
+```
+ k get po,svc
+NAME                              READY   STATUS    RESTARTS   AGE
+pod/ollama-0                      1/1     Running   0          27s
+pod/open-webui-57859d4c69-fzvrz   1/1     Running   0          27s
+
+NAME                 TYPE           CLUSTER-IP      EXTERNAL-IP    PORT(S)        AGE
+service/ollama       ClusterIP      10.43.192.8     <none>         80/TCP         27s
+service/open-webui   LoadBalancer   10.43.102.232   10.125.0.142   80:31917/TCP   27s
+```
+
+This would expose Open WebUI as a LoadBalancer service on port 80 of the Kubernetes cluster. In this case it is http://10.125.0.142
+
+Signup from the webui and login with your local creds, since this is deployed without any LLMs, we will have to pull in a model. 
+You can either do it from the webui or by connecting to the pod and running:
+```
+
+k exec -it pods/ollama-0 -- bash
+root@ollama-0:/# ollama run llama3 ## in this case we are downloading Meta llama3 model
+pulling manifest 
+pulling 00e1317cbf74... 100% ▕████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████▏ 4.7 GB                         
+pulling 4fa551d4f938... 100% ▕████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████▏  12 KB                         
+pulling 8ab4849b038c... 100% ▕████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████▏  254 B                         
+pulling 577073ffcc6c... 100% ▕████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████▏  110 B                         
+pulling ad1518640c43... 100% ▕████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████▏  483 B                         
+verifying sha256 digest 
+writing manifest 
+removing any unused layers 
+success 
+
+```
+
+Ideally, you should see the llama3 added in the webui, select it as the model and start chatting!
+
 ### Quick Start with Docker 🐳
 
 > [!WARNING]
