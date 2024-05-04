@@ -302,3 +302,4 @@ dist
 # cypress artifacts
 cypress/videos
 cypress/screenshots
+.idx/dev.nix
