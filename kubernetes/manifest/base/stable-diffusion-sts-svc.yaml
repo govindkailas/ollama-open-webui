@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: stable-diffusion-webui
+spec:
+  selector:
+    matchLabels:
+      app: stable-diffusion-webui
+  serviceName: sd-webui-svc
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: stable-diffusion-webui
+    spec:
+      containers:
+      - name: sd-webui
+        image: ghcr.io/govindkailas/ollama-open-webui/stable-difussion-webui:main
+        env:
+          - name: CLI_ARGS
+            value: "--no-half --precision full --allow-code --enable-insecure-extension-access --api"
+        ports:
+        - containerPort: 7860
+        resources:
+          limits:
+            cpu: "16"
+            memory: 32Gi
+        volumeMounts:
+        - name: model-data
+          mountPath: /data
+        - name: output
+          mountPath: /output    
+  volumeClaimTemplates:
+  - metadata:
+      name: model-data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: rook-ceph-block
+      resources:
+        requests:
+          storage: 20Gi
+  - metadata:
+      name: output
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 10Gi          
+## More details, https://github.com/AbdBarho/stable-diffusion-webui-docker/blob/master/docker-compose.yml   
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sd-webui-svc
+spec:
+  selector:
+    app: stable-diffusion-webui
+  type: LoadBalancer
+  ports:
+  - name: sd-webui
+    port: 7860
