@@ -166,6 +166,19 @@ success
 
 Ideally, you should see the llama3 added in the webui, select it as the model and start chatting!
 
+## Installing stable-diffusion
+Stable difussion can be used for image generation tasks with Open WebUI. To install stable diffusion:
+```
+k apply -f kubernetes/manifest/base/stable-diffusion-sts-svc.yaml
+```
+
+This would create a deployment and expose the service as well. We can later use the service name in the Ollama webui to generate image.
+
+![ollama-image](sd-webui.png)
+
+*Note: Since we are using CPU to generate the image, it may take some time. For faster generation, we need GPU support.*
+More details here, https://github.com/AbdBarho/stable-diffusion-webui-docker/blob/master/docker-compose.yml
+
 ### Quick Start with Docker 🐳
 
 > [!WARNING]
